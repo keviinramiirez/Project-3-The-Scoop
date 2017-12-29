@@ -131,26 +131,6 @@ function alreadyDownvoted(databaseComment, username) {
   return databaseComment.downvotedBy.includes(username);
 }
 
-// function DELETE(url) {
-//   const urlId = url.split('/').filter(segment => segment)[1];
-//   const comment = database.comments[urlId];
-//   const response = {};
-//
-//   if (database.comments[urlId]) {
-//     const username = comment.username;
-//     database.comments[urlId] = null;
-//     let commentIndex = database.users[username].commentIds.indexOf(1);
-//     database.users[username].commentIds.splice(commentIndex, 1);
-//     commentIndex = database.articles[urlId].commentIds.indexOf(1)
-//     database.articles[urlId].commentIds.splice(commentIndex, 1);
-//     response.status = 204;
-//   }
-//   else
-//     response.status = 404;
-//
-//   return response;
-// }
-
 function DELETE(url) {
   const urlId = url.split('/').filter(segment => segment)[1];
   const databaseComment = database.comments[urlId];
