@@ -317,6 +317,19 @@ describe('Scoop - server.js: ', function()
 
   });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
   describe('/comments/:id DELETE', function() {
 
     beforeEach(function() {
@@ -357,12 +370,12 @@ describe('Scoop - server.js: ', function()
 
     it('routes[\'/comments/:id\'].DELETE should remove a deleted comment ID from the author\'s comment IDs', function() {
       routes['/comments/:id']['DELETE']('/comments/1');
-      expect(database.users['user'].commentIds).to.equal([2]);
+      expect(database.users['user'].commentIds).to.eql([2]);
     });
 
     it('routes[\'/comments/:id\'].DELETE should remove a deleted comment ID from the article\'s comment IDs', function() {
       routes['/comments/:id']['DELETE']('/comments/1');
-      expect(database.articles[1].commentIds).to.equal([2]);
+      expect(database.articles[1].commentIds).to.eql([2]);
     });
 
     it('routes[\'/comments/:id\'].DELETE should return a 204 response after a succesful delete', function() {
@@ -378,23 +391,6 @@ describe('Scoop - server.js: ', function()
     });
 
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   describe('/commnets/:id/upvote PUT', function() {
 

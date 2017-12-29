@@ -78,7 +78,8 @@ function PUT(url, request) {
   const databaseRequestComment = database.comments[urlId];
   const response = {};
 
-  if (requestComment && requestComment.body && requestComment.username && requestComment.articleId) {
+  if (requestComment && requestComment.body && requestComment.username && requestComment.articleId)
+  {
     response.body = {comment: requestComment};
     response.status = 200;
     if (!databaseRequestComment)
@@ -103,6 +104,7 @@ function PUT(url, request) {
             const index = database.comments[urlId].downvotedBy.indexOf(requestUsername);
             database.comments[urlId].downvotedBy.splice(index, 1);
           }
+          break;
         case 'downvote':
           if (!alreadyDownvoted(databaseRequestComment, requestUsername)) {
             database.comments[urlId].upvotedBy.push(requestUsername);
@@ -129,21 +131,42 @@ function alreadyDownvoted(databaseComment, username) {
   return databaseComment.downvotedBy.includes(username);
 }
 
+// function DELETE(url) {
+//   const urlId = url.split('/').filter(segment => segment)[1];
+//   const comment = database.comments[urlId];
+//   const response = {};
+//
+//   if (database.comments[urlId]) {
+//     const username = comment.username;
+//     database.comments[urlId] = null;
+//     let commentIndex = database.users[username].commentIds.indexOf(1);
+//     database.users[username].commentIds.splice(commentIndex, 1);
+//     commentIndex = database.articles[urlId].commentIds.indexOf(1)
+//     database.articles[urlId].commentIds.splice(commentIndex, 1);
+//     response.status = 204;
+//   }
+//   else
+//     response.status = 404;
+//
+//   return response;
+// }
 
-
-function DELETE(url, request) {
+function DELETE(url) {
   const urlId = url.split('/').filter(segment => segment)[1];
-  const requestComment = request.body && request.body.comment;
+  const databaseComment = database.comments[urlId];
   const response = {};
 
-  if (requestComment && requestComment.includes(urlId)) {
+  if (databaseComment) {
+    const username = databaseComment.username;
     database.comments[urlId] = null;
-    database.users[requestComment.username].commentIds[urlId] = null;
-    database.articles[requestComment.articleId].commentIds[urlId] = null;
+    let commentIndex = database.users[username].commentIds.indexOf(1);
+    database.users[username].commentIds.splice(commentIndex, 1);
+    commentIndex = database.articles[urlId].commentIds.indexOf(1)
+    database.articles[urlId].commentIds.splice(commentIndex, 1);
     response.status = 204;
   }
   else
-    response.status = 400;
+    response.status = 404;
 
   return response;
 }
