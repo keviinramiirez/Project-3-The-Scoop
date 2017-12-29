@@ -61,7 +61,7 @@ function POST(url, request) {
     };
     database.comments[comment.id] = comment;//adds comment to database
     database.users[comment.username].commentIds.push(comment.id);
-    database.articles[requestComment.articleId].commentIds.push(comment.id);
+    database.articles[comment.articleId].commentIds.push(comment.id);
 
     response.body = {comment: comment};
     response.status = 201;
@@ -86,8 +86,10 @@ function PUT(url, request) {
       response.status = 404;
 
     database.comments[requestComment.id] = requestComment;
-
+/*************************************************************************************/
                   /* VOTE IMPLEMENTATION */
+    //I have analysed this implementation thoroughly & I still dont succeed all tests
+    //Is there something wrong with my syntax or implementation?
     if (url.split('/').length > 2)
     {
       const urlVote = url.split('/').filter(segment => segment)[2];
@@ -107,7 +109,7 @@ function PUT(url, request) {
           break;
         case 'downvote':
           if (!alreadyDownvoted(databaseRequestComment, requestUsername)) {
-            database.comments[urlId].upvotedBy.push(requestUsername);
+            database.comments[urlId].downvotedBy.push(requestUsername);
             response.status = 200;
             response.body = {comment: databaseRequestComment};
           }
@@ -117,13 +119,13 @@ function PUT(url, request) {
           }
       }
     }
+/*************************************************************************************/
   }
   else
     response.status = 400;
 
   return response;
 }
-
 function alreadyUpvoted(databaseComment, username) {
   return databaseComment.upvotedBy.includes(username);
 }
