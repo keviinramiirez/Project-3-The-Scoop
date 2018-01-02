@@ -5,8 +5,7 @@ const rewire = require('rewire');
 const serverModule = rewire('../server.js');
 const expect = require('chai').expect;
 
-describe('Scoop - server.js: ', function()
-{
+describe('Scoop - server.js: ', function() {
   let database, routes, originalDatabase, originalNextArticleId,
       originalCommentId;
 
@@ -317,19 +316,6 @@ describe('Scoop - server.js: ', function()
 
   });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   describe('/comments/:id DELETE', function() {
 
     beforeEach(function() {
@@ -365,27 +351,32 @@ describe('Scoop - server.js: ', function()
 
     it('routes[\'/comments/:id\'].DELETE should delete an existing comment', function() {
       routes['/comments/:id']['DELETE']('/comments/1');
+
       expect(database.comments[1]).to.equal(null);
     });
 
     it('routes[\'/comments/:id\'].DELETE should remove a deleted comment ID from the author\'s comment IDs', function() {
       routes['/comments/:id']['DELETE']('/comments/1');
+
       expect(database.users['user'].commentIds).to.eql([2]);
     });
 
     it('routes[\'/comments/:id\'].DELETE should remove a deleted comment ID from the article\'s comment IDs', function() {
       routes['/comments/:id']['DELETE']('/comments/1');
+
       expect(database.articles[1].commentIds).to.eql([2]);
     });
 
     it('routes[\'/comments/:id\'].DELETE should return a 204 response after a succesful delete', function() {
       const response = routes['/comments/:id']['DELETE']('/comments/1');
+
       expect(response).to.exist;
       expect(response.status).to.equal(204);
     });
 
     it('routes[\'/comments/:id\'].DELETE should return a 404 response with a non-existent comment ID', function() {
       const response = routes['/comments/:id']['DELETE']('/comments/3');
+
       expect(response).to.exist;
       expect(response.status).to.equal(404);
     });
@@ -419,7 +410,7 @@ describe('Scoop - server.js: ', function()
       expect(routes['/comments/:id/upvote']['PUT']).to.exist;
     });
 
-    it('routes[\'/comments/:id/upvote\'].PUT should upvote a comment', function() {
+    it('routes[\'/comments/:id/upvote\'].PUT should upvote an comment', function() {
       routes['/comments/:id/upvote']['PUT']('/comments/1/upvote', {body: {username: 'other_user'}});
 
       expect(database.comments[1].upvotedBy).to.contain('user');
@@ -433,7 +424,7 @@ describe('Scoop - server.js: ', function()
     });
 
     it('routes[\'/comments/:id/upvote\'].PUT should remove a user from downvotedBy if they switch to upvote', function() {
-      database.comments[1].downvotedBy.push('other_user');
+      database.comments[1].downvotedBy.push('other_user')
       routes['/comments/:id/upvote']['PUT']('/comments/1/upvote', {body: {username: 'other_user'}});
 
       expect(database.comments[1].upvotedBy).to.contain('other_user');

@@ -74,63 +74,44 @@ function POST(url, request) {
 
 function PUT(url, request) {
   const urlId = url.split('/').filter(segment => segment)[1];
+  const requestBody = request && request.body;
   const requestComment = request.body && request.body.comment;
   const databaseRequestComment = database.comments[urlId];
   const response = {};
 
-  if (requestComment && requestComment.body && requestComment.username && requestComment.articleId)
+  if (url.split('/').length === 3 && requestBody && requestComment &&
+      requestComment.body && requestComment.username && requestComment.articleId)
   {
-    response.body = {comment: requestComment};
-    response.status = 200;
-    if (!databaseRequestComment)
-      response.status = 404;
-
-    database.comments[requestComment.id] = requestComment;
-/*************************************************************************************/
-                  /* VOTE IMPLEMENTATION */
-    //I have analysed this implementation thoroughly & I still dont succeed all tests
-    //Is there something wrong with my syntax or implementation?
-    if (url.split('/').length > 2)
-    {
-      const urlVote = url.split('/').filter(segment => segment)[2];
-      const requestUsername = request.body && request.body.username;
-
-      switch (urlVote) {
-        case 'upvote':
-          if (!alreadyUpvoted(databaseRequestComment, requestUsername)) {
-            database.comments[urlId].upvotedBy.push(requestUsername);
-            response.status = 200;
-            response.body = {comment: databaseRequestComment};
-          }
-          if (alreadyDownvoted(databaseRequestComment, requestUsername)) {
-            const index = database.comments[urlId].downvotedBy.indexOf(requestUsername);
-            database.comments[urlId].downvotedBy.splice(index, 1);
-          }
-          break;
-        case 'downvote':
-          if (!alreadyDownvoted(databaseRequestComment, requestUsername)) {
-            database.comments[urlId].downvotedBy.push(requestUsername);
-            response.status = 200;
-            response.body = {comment: databaseRequestComment};
-          }
-          if (alreadyUpvoted(databaseRequestComment, requestUsername)) {
-            const index = database.comments[urlId].upvotedBy.indexOf(requestUsername);
-            database.comments[urlId].upvotedBy.splice(index, 1);
-          }
-      }
+    // response.body = {comment: requestComment};
+    // response.status = 200;
+    // if (databaseRequestComment)
+    //   database.comments[requestComment.id] = requestComment;
+    if (databaseRequestComment) {
+      database.comments[requestComment.id] = requestComment;
+      response.body = {comment: requestComment};
+      response.status = 200;
     }
-/*************************************************************************************/
+    else
+      response.status = 404;
+  }
+              /* UP:DOWN - VOTE IMPLEMENTATION */
+  else if (url.split('/').length > 3 && requestBody &&
+           database.users[requestBody.username] && databaseRequestComment)
+  {
+    const urlVote = url.split('/').filter(segment => segment)[2];
+    const requestUsername = request.body && request.body.username;
+
+    if (urlVote === 'upvote')
+      upvote(database.comments[urlId], requestUsername);
+    else if (urlVote === 'downvote')
+      downvote(database.comments[urlId], requestUsername);
+    response.status = 200;
+    response.body = {comment: databaseRequestComment};
   }
   else
     response.status = 400;
 
   return response;
-}
-function alreadyUpvoted(databaseComment, username) {
-  return databaseComment.upvotedBy.includes(username);
-}
-function alreadyDownvoted(databaseComment, username) {
-  return databaseComment.downvotedBy.includes(username);
 }
 
 function DELETE(url) {
@@ -141,10 +122,10 @@ function DELETE(url) {
   if (databaseComment) {
     const username = databaseComment.username;
     database.comments[urlId] = null;
-    let commentIndex = database.users[username].commentIds.indexOf(1);
-    database.users[username].commentIds.splice(commentIndex, 1);
-    commentIndex = database.articles[urlId].commentIds.indexOf(1)
-    database.articles[urlId].commentIds.splice(commentIndex, 1);
+    let commentIdIndex = database.users[username].commentIds.indexOf(1);
+    database.users[username].commentIds.splice(commentIdIndex, 1);
+    commentIdIndex = database.articles[urlId].commentIds.indexOf(1)
+    database.articles[urlId].commentIds.splice(commentIdIndex, 1);
     response.status = 204;
   }
   else
